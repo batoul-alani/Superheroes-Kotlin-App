@@ -1,3 +1,9 @@
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.Spring.DampingRatioLowBouncy
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,6 +21,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,8 +34,25 @@ import com.example.superheroes.model.HeroesRepository
 
 @Composable
 fun SuperHeroesList(heroes : List<Hero>, contentPadding: PaddingValues = PaddingValues(0.dp),){
-    LazyColumn (modifier = Modifier.padding(all = 16.dp)) {
-        itemsIndexed(heroes) { index, hero -> SuperHeroesItem(hero = hero, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+    val visibleState = remember {
+        MutableTransitionState(false).apply {
+            // Start the animation immediately.
+            targetState = true
+        }
+    }
+
+    AnimatedVisibility(visibleState = visibleState, enter = fadeIn(
+            animationSpec = spring(dampingRatio = DampingRatioLowBouncy)
+            ),
+        exit = fadeOut(),
+        ) {
+        LazyColumn(modifier = Modifier.padding(all = 16.dp)) {
+            itemsIndexed(heroes) { index, hero ->
+                SuperHeroesItem(
+                    hero = hero,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
         }
     }
 }
